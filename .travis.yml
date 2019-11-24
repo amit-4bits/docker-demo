@@ -1,0 +1,35 @@
+sudo: required
+services:
+  - docker
+
+before_install:
+  - docker build -t amit/react-test -f ./client/Dockerfile.dev ./client
+
+script:
+  - docker run amit/react-test npm test -- --coverage
+
+after_success:
+  - docker build -t amit/multi-client ./client
+  - docker build -t amit/multi-nginx ./nginx
+  - docker build -t amit/multi-server ./server
+  - docker build -t amit/multi-worker ./worker
+  # Log in to the docker CLI
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
+  # Take those images and push them to docker hub
+  - docker push amit/multi-client
+  - docker push amit/multi-nginx
+  - docker push amit/multi-server
+  - docker push amit/multi-worker
+
+deploy:
+  provider: elasticbeanstalk
+  region: ap-south-1
+  app: multi-docker
+  env: MultiDocker-env
+  bucket_name: elasticbeanstalk-ap-south-1-784598560256
+  bucket_path: docker-multi
+  on:
+    branch: master
+  access_key_id: AKIA3NLNX5YACFPDJYKC
+  secret_access_key:
+  secure: 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
