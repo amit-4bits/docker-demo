@@ -27,7 +27,7 @@ deploy:
   app: multi-docker
   env: MultiDocker-env
   bucket_name: elasticbeanstalk-ap-south-1-784598560256
-  bucket_path: docker-multi
+  bucket_path: 
   on:
    branch: master
   access_key_id: $AWS_ACCESS_KEY
